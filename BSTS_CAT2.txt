@@ -1,0 +1,1307 @@
+import java.util.*;
+class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+    TreeNode() {
+    }
+    TreeNode(int val) {
+        this.val = val;
+    }
+    TreeNode(int val, TreeNode left, TreeNode right) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+    }
+}
+public class Solution {
+    Map<Integer, TreeMap<Integer, PriorityQueue<Integer>>> nodes;
+    public List<List<Integer>> verticalTraversal(TreeNode root) {
+        if (root == null)
+            return null;
+        nodes = new TreeMap<>();
+        dfs(root, 0, 0);
+        List<List<Integer>> res = new LinkedList<>();
+        for (int key : nodes.keySet()) {
+            List<Integer> list = new LinkedList<>();
+            TreeMap<Integer, PriorityQueue<Integer>> temp = nodes.get(key);
+            for (int k : temp.keySet()) {
+                PriorityQueue<Integer> que = temp.get(k);
+                while (!que.isEmpty()) {
+                    list.add(que.poll());
+                }
+            }
+            res.add(list);
+        }
+        return res;
+    }
+    private void dfs(TreeNode root, int index, int level) {
+        if (root == null)
+            return;
+        nodes.putIfAbsent(index, new TreeMap<>());
+        nodes.get(index).putIfAbsent(level, new PriorityQueue<>());
+        nodes.get(index).get(level).add(root.val);
+        dfs(root.left, index - 1, level + 1);
+        dfs(root.right, index + 1, level + 1);
+    }
+    public static void main(String[] args) {
+        // Example usage:
+        // Constructing a binary tree
+        TreeNode root = new TreeNode(3);
+        root.left = new TreeNode(9);
+        root.right = new TreeNode(20);
+        root.right.left = new TreeNode(15);
+        root.right.right = new TreeNode(7);
+
+        // Vertical traversal
+        Solution solution = new Solution();
+        List<List<Integer>> result = solution.verticalTraversal(root);
+
+        // Printing the result
+        for (List<Integer> list : result) {
+            System.out.println(list);
+        }
+    }
+}
+
+
+
+VERTICAL TRAVERSAL
+
+BOUNDARY TRAVERSAL
+import java.util.*;
+class Node {
+    int data;
+    Node left, right;
+    Node(int data) {
+        this.data = data;
+        this.left = this.right = null;
+    }
+}
+class BinaryTree {
+    static void printLeftBoundary(Node root) {
+        if (root == null) {
+            return;
+        }
+        if (root.left != null || root.right != null) {
+            System.out.print(root.data + " ");
+        }
+        if (root.left != null) {
+            printLeftBoundary(root.left);
+        } 
+        else {
+            printLeftBoundary(root.right);
+        }
+    }
+    static void printRightBoundary(Node root) {
+        if (root == null) {
+            return;
+        }
+        if (root.right != null) {
+            printRightBoundary(root.right);
+        } 
+        else {
+            printRightBoundary(root.left);
+        }
+        if (root.left != null || root.right != null) {
+            System.out.print(root.data + " ");
+        }
+    }
+    static void printLeaves(Node root) {
+        if (root == null) {
+            return;
+        }
+        printLeaves(root.left);
+        if (root.left == null && root.right == null) {
+            System.out.print(root.data + " ");
+        }
+        printLeaves(root.right);
+    }
+    static void printBoundary(Node root) {
+        if (root == null) {
+            return;
+        }
+        System.out.print(root.data + " ");
+        printLeftBoundary(root.left);
+        printLeaves(root.left);
+        printLeaves(root.right);
+        printRightBoundary(root.right);
+    }
+    public static void main(String[] args) {
+        Node root = new Node(20);
+        root.left = new Node(8);
+        root.left.left = new Node(4);
+        root.left.right = new Node(12);
+        root.left.right.left = new Node(10);
+        root.left.right.right = new Node(14);
+        root.right = new Node(22);
+        root.right.right = new Node(25);
+        printBoundary(root);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+HEAP SORT
+
+import java.util.*;
+class HeapSortUsingSTL {
+    public static void heapSort(int[] arr)
+    {
+        PriorityQueue<Integer> maxHeap
+            = new PriorityQueue<>(
+                Collections.reverseOrder());
+        for (int i = 0; i < arr.length; i++) {
+            maxHeap.offer(arr[i]);
+        }
+        for (int i = arr.length - 1; i >= 0; i--) {
+            arr[i] = maxHeap.poll();
+        }
+    }
+    public static void main(String[] args)
+    {
+        int[] arr = { 60, 20, 40, 70, 30, 10 };
+        heapSort(arr);
+        System.out.println(""+ Arrays.toString(arr));
+    }
+}
+
+
+K-ARY HEAP
+class KaryHeap {
+    public static void main(String[] args) {
+        final int capacity = 100;
+        int[] arr = new int[capacity];
+        arr[0] = 4;
+        arr[1] = 5;
+        arr[2] = 6;
+        arr[3] = 7;
+        arr[4] = 8;
+        arr[5] = 9;
+        arr[6] = 10;
+        int n = 7;
+        int k = 3;
+        buildHeap(arr, n, k);
+        System.out.println("Built Heap: ");
+        for (int i = 0; i < n; i++)
+            System.out.print(arr[i] + " ");
+        int element = 3;
+        insert(arr, n, k, element);
+        n++;
+        System.out.println("\n\nHeap after insertion of " + element + ": ");
+        for (int i = 0; i < n; i++)
+            System.out.print(arr[i] + " ");
+        System.out.println("\n\nExtracted max is " + extractMax(arr, n, k));
+        n--;
+        System.out.println("\n\nHeap after extract max: ");
+        for (int i = 0; i < n; i++)
+            System.out.print(arr[i] + " ");
+    }
+    public static void buildHeap(int[] arr, int n, int k) {
+        for (int i = (n - 1) / k; i >= 0; i--)
+            restoreDown(arr, n, i, k);
+    }
+    public static void insert(int[] arr, int n, int k, int elem) {
+        arr[n - 1] = elem;
+        restoreUp(arr, n - 1, k);
+    }
+    public static int extractMax(int[] arr, int n, int k) {
+        int max = arr[0];
+        arr[0] = arr[n - 1];
+        restoreDown(arr, n - 1, 0, k);
+        return max;
+    }
+    public static void restoreDown(int[] arr, int len, int index, int k) {
+        int[] child = new int[k + 1];
+        while (true) {
+            for (int i = 1; i <= k; i++)
+                child[i] = (k * index + i) < len ? (k * index + i) : -1;
+            int maxChild = -1, maxChildIndex = 0;
+            for (int i = 1; i <= k; i++) {
+                if (child[i] != -1 && arr[child[i]] > maxChild) {
+                    maxChildIndex = child[i];
+                    maxChild = arr[child[i]];
+                }
+            }
+            if (maxChild == -1)
+                break;
+            if (arr[index] < arr[maxChildIndex])
+                swap(arr, index, maxChildIndex);
+            index = maxChildIndex;
+        }
+    }
+    public static void restoreUp(int[] arr, int index, int k) {
+        int parent = (index - 1) / k;
+        while (parent >= 0) {
+            if (arr[index] > arr[parent]) {
+                swap(arr, index, parent);
+                index = parent;
+                parent = (index - 1) / k;
+            } else
+                break;
+        }
+    }
+    public static void swap(int[] arr, int i, int j) {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+}
+
+
+
+
+
+BFS
+import java.util.LinkedList;
+import java.util.Queue;
+class Graph {
+    int vertices;
+    LinkedList<Integer>[] adjList;
+    @SuppressWarnings("unchecked") Graph(int vertices)
+    {
+        this.vertices = vertices;
+        adjList = new LinkedList[vertices];
+        for (int i = 0; i < vertices; ++i)
+            adjList[i] = new LinkedList<>();
+    }
+    void addEdge(int u, int v) { adjList[u].add(v); }
+    void bfs(int startNode)
+    {
+        Queue<Integer> queue = new LinkedList<>();
+        boolean[] visited = new boolean[vertices];
+        visited[startNode] = true;
+        queue.add(startNode);
+        while (!queue.isEmpty()) {
+            int currentNode = queue.poll();
+            System.out.print(currentNode + " ");
+            for (int neighbor : adjList[currentNode]) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    queue.add(neighbor);
+                }
+            }
+        }
+    }
+}
+public class Main {
+    public static void main(String[] args)
+    {
+        int vertices = 5;
+        Graph graph = new Graph(vertices);
+        graph.addEdge(0, 1);
+        graph.addEdge(0, 2);
+        graph.addEdge(1, 3);
+        graph.addEdge(1, 4);
+        graph.addEdge(2, 4);
+        System.out.println();
+        graph.bfs(0);
+    }
+}
+
+DFS
+import java.util.*;
+class Graph {
+    private int V;                          
+    private LinkedList<Integer> adj[];          
+    public Graph(int v)
+    {
+        V = v;
+        adj = new LinkedList[v];
+        for (int i = 0; i < v; ++i) {
+            adj[i] = new LinkedList();
+        }
+    }
+    void addEdge(int v, int w)
+    {
+        adj[v].add(w);                              
+    }
+    void DFSUtil(int vertex, boolean nodes[])
+    {
+        nodes[vertex] = true;                         
+        System.out.print(vertex + " ");
+        int a = 0;
+ 
+        for (int i = 0; i < adj[vertex].size(); i++)  
+        {
+            a = adj[vertex].get(i);
+            if (!nodes[a])                   
+            {
+                DFSUtil(a, nodes);
+            }
+        }  
+    }
+    void DFS(int v)
+    {
+        boolean already[] = new boolean[V]; 
+        DFSUtil(v, already);
+    }
+    public static void main(String args[])
+    {
+        Graph g = new Graph(6);
+        g.addEdge(0, 1);
+        g.addEdge(0, 2);
+        g.addEdge(1, 0);
+        g.addEdge(1, 3);
+        g.addEdge(2, 0);
+        g.addEdge(2, 3);
+        g.addEdge(3, 4);
+        g.addEdge(3, 5);
+        g.addEdge(4, 3);
+        g.addEdge(5, 3);
+        System.out.println("");
+        g.DFS(0);
+    }
+}
+
+
+Recover BST
+import java.util.Scanner;
+
+class TreeNode {
+    int val;
+    TreeNode left, right;
+
+    TreeNode(int val) {
+        this.val = val;
+        left = right = null;
+    }
+}
+
+public class RecoverBST {
+    TreeNode firstElement = null;
+    TreeNode secondElement = null;
+    TreeNode prevElement = new TreeNode(Integer.MIN_VALUE);
+
+    public void recoverTree(TreeNode root) {
+        // Traverse the tree and identify the swapped nodes
+        traverse(root);
+
+        // Swap the values of the two identified nodes
+        int temp = firstElement.val;
+        firstElement.val = secondElement.val;
+        secondElement.val = temp;
+    }
+
+    private void traverse(TreeNode root) {
+        if (root == null)
+            return;
+
+        // In-order traversal
+        traverse(root.left);
+
+        // Check for the swapped nodes
+        if (firstElement == null && root.val < prevElement.val) {
+            firstElement = prevElement;
+        }
+        if (firstElement != null && root.val < prevElement.val) {
+            secondElement = root;
+        }
+        prevElement = root;
+
+        traverse(root.right);
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Construct the BST from user input
+        System.out.println("Enter the root value of the BST:");
+        int rootVal = scanner.nextInt();
+        TreeNode root = new TreeNode(rootVal);
+        constructBST(root, scanner);
+
+        // Recover the BST
+        RecoverBST recoverBST = new RecoverBST();
+        recoverBST.recoverTree(root);
+
+        // Print the recovered tree
+        System.out.println("Recovered Tree:");
+        printInOrder(root);
+
+        scanner.close();
+    }
+
+    private static void constructBST(TreeNode root, Scanner scanner) {
+        System.out.println("Enter left child for node " + root.val + " (Enter -1 if no left child):");
+        int leftVal = scanner.nextInt();
+        if (leftVal != -1) {
+            root.left = new TreeNode(leftVal);
+            constructBST(root.left, scanner);
+        }
+
+        System.out.println("Enter right child for node " + root.val + " (Enter -1 if no right child):");
+        int rightVal = scanner.nextInt();
+        if (rightVal != -1) {
+            root.right = new TreeNode(rightVal);
+            constructBST(root.right, scanner);
+        }
+    }
+
+    private static void printInOrder(TreeNode root) {
+        if (root == null)
+            return;
+        printInOrder(root.left);
+        System.out.print(root.val + " ");
+        printInOrder(root.right);
+    }
+}
+Sample Input:
+Enter the root value of the BST:
+3
+Enter left child for node 3 (Enter -1 if no left child):
+1
+Enter right child for node 3 (Enter -1 if no right child):
+4
+Enter left child for node 1 (Enter -1 if no left child):
+-1
+Enter right child for node 1 (Enter -1 if no right child):
+-1
+Enter left child for node 4 (Enter -1 if no left child):
+2
+Enter right child for node 4 (Enter -1 if no right child):
+-1
+Enter left child for node 2 (Enter -1 if no left child):
+-1
+Enter right child for node 2 (Enter -1 if no right child):
+-1
+
+
+View Of TREE( Right & Left)
+import java.util.*;
+
+class TreeNode {
+    int val;
+    TreeNode left, right;
+
+    TreeNode(int val) {
+        this.val = val;
+        left = right = null;
+    }
+}
+
+class TreeView {
+    public static void leftView(TreeNode root) {
+        if (root == null)
+            return;
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode current = queue.poll();
+                if (i == 0) {
+                    System.out.print(current.val + " ");
+                }
+                if (current.left != null) {
+                    queue.offer(current.left);
+                }
+                if (current.right != null) {
+                    queue.offer(current.right);
+                }
+            }
+        }
+    }
+
+    public static void rightView(TreeNode root) {
+        if (root == null)
+            return;
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode current = queue.poll();
+                if (i == size - 1) {
+                    System.out.print(current.val + " ");
+                }
+                if (current.left != null) {
+                    queue.offer(current.left);
+                }
+                if (current.right != null) {
+                    queue.offer(current.right);
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Construct the binary tree from user input
+        System.out.println("Enter the root value of the tree:");
+        int rootVal = scanner.nextInt();
+        TreeNode root = new TreeNode(rootVal);
+        constructTree(root, scanner);
+
+        // Print the views of the tree
+        System.out.println("Left View of the Tree:");
+        leftView(root);
+
+        System.out.println("\nRight View of the Tree:");
+        rightView(root);
+
+        scanner.close();
+    }
+
+    private static void constructTree(TreeNode root, Scanner scanner) {
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+            TreeNode current = queue.poll();
+
+            System.out.println("Enter left child for node " + current.val + " (Enter -1 if no left child):");
+            int leftVal = scanner.nextInt();
+            if (leftVal != -1) {
+                current.left = new TreeNode(leftVal);
+                queue.offer(current.left);
+            }
+
+            System.out.println("Enter right child for node " + current.val + " (Enter -1 if no right child):");
+            int rightVal = scanner.nextInt();
+            if (rightVal != -1) {
+                current.right = new TreeNode(rightVal);
+                queue.offer(current.right);
+            }
+        }
+    }
+}
+Sample:
+Enter the root value of the tree:
+1
+Enter left child for node 1 (Enter -1 if no left child):
+2
+Enter right child for node 1 (Enter -1 if no right child):
+3
+Enter left child for node 2 (Enter -1 if no left child):
+4
+Enter right child for node 2 (Enter -1 if no right child):
+-1
+Enter left child for node 3 (Enter -1 if no left child):
+-1
+Enter right child for node 3 (Enter -1 if no right child):
+5
+Enter left child for node 4 (Enter -1 if no left child):
+-1
+Enter right child for node 4 (Enter -1 if no right child):
+-1
+Enter left child for node 5 (Enter -1 if no left child):
+-1
+Enter right child for node 5 (Enter -1 if no right child):
+-1
+Dial’s ALGORITHM 
+import java.util.*;
+
+class DijkstraAlgorithm {
+    static class Edge {
+        int destination;
+        int weight;
+
+        Edge(int destination, int weight) {
+            this.destination = destination;
+            this.weight = weight;
+        }
+    }
+
+    static class Graph {
+        int vertices;
+        List<List<Edge>> adjacencyList;
+
+        Graph(int vertices) {
+            this.vertices = vertices;
+            adjacencyList = new ArrayList<>(vertices);
+            for (int i = 0; i < vertices; i++) {
+                adjacencyList.add(new ArrayList<>());
+            }
+        }
+
+        void addEdge(int source, int destination, int weight) {
+            adjacencyList.get(source).add(new Edge(destination, weight));
+        }
+
+        void dijkstra(int source) {
+            PriorityQueue<Edge> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(a -> a.weight));
+            int[] distance = new int[vertices];
+            Arrays.fill(distance, Integer.MAX_VALUE);
+            distance[source] = 0;
+
+            priorityQueue.offer(new Edge(source, 0));
+
+            while (!priorityQueue.isEmpty()) {
+                Edge current = priorityQueue.poll();
+                int currentVertex = current.destination;
+
+                for (Edge neighbor : adjacencyList.get(currentVertex)) {
+                    int newDistance = distance[currentVertex] + neighbor.weight;
+                    if (newDistance < distance[neighbor.destination]) {
+                        distance[neighbor.destination] = newDistance;
+                        priorityQueue.offer(new Edge(neighbor.destination, newDistance));
+                    }
+                }
+            }
+
+            System.out.println("Shortest distances from source node " + source + ":");
+            for (int i = 0; i < vertices; i++) {
+                if (distance[i] != Integer.MAX_VALUE) {
+                    System.out.println("Node " + i + ": " + distance[i]);
+                } else {
+                    System.out.println("Node " + i + ": Infinity");
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Get the number of vertices and edges
+        System.out.println("Enter the number of vertices:");
+        int vertices = scanner.nextInt();
+        System.out.println("Enter the number of edges:");
+        int edges = scanner.nextInt();
+
+        // Create a graph
+        Graph graph = new Graph(vertices);
+
+        // Add edges to the graph
+        System.out.println("Enter the edges in the format (source destination weight):");
+        for (int i = 0; i < edges; i++) {
+            int source = scanner.nextInt();
+            int destination = scanner.nextInt();
+            int weight = scanner.nextInt();
+            graph.addEdge(source, destination, weight);
+        }
+
+        // Get the source node
+        System.out.println("Enter the source node:");
+        int source = scanner.nextInt();
+
+        // Run Dijkstra's algorithm
+        graph.dijkstra(source);
+
+        scanner.close();
+    }
+}
+Sample INPUT:
+Enter the number of vertices:
+6
+Enter the number of edges:
+9
+Enter the edges in the format (source destination weight):
+0 1 4
+0 2 2
+1 2 5
+1 3 10
+2 3 3
+2 4 2
+2 5 8
+3 4 6
+4 5 1
+Enter the source node:
+0
+Bellman Ford Algorithm
+import java.util.*;
+
+class BellmanFordAlgorithm {
+    static class Edge {
+        int source, destination, weight;
+
+        Edge(int source, int destination, int weight) {
+            this.source = source;
+            this.destination = destination;
+            this.weight = weight;
+        }
+    }
+
+    static class Graph {
+        int vertices, edges;
+        List<Edge> edgeList;
+
+        Graph(int vertices, int edges) {
+            this.vertices = vertices;
+            this.edges = edges;
+            edgeList = new ArrayList<>();
+        }
+
+        void addEdge(int source, int destination, int weight) {
+            edgeList.add(new Edge(source, destination, weight));
+        }
+
+        void bellmanFord(int source) {
+            int[] distance = new int[vertices];
+            Arrays.fill(distance, Integer.MAX_VALUE);
+            distance[source] = 0;
+
+            // Relax all edges (vertices - 1) times
+            for (int i = 0; i < vertices - 1; i++) {
+                for (Edge edge : edgeList) {
+                    if (distance[edge.source] != Integer.MAX_VALUE && distance[edge.source] + edge.weight < distance[edge.destination]) {
+                        distance[edge.destination] = distance[edge.source] + edge.weight;
+                    }
+                }
+            }
+
+            // Check for negative weight cycles
+            for (Edge edge : edgeList) {
+                if (distance[edge.source] != Integer.MAX_VALUE && distance[edge.source] + edge.weight < distance[edge.destination]) {
+                    System.out.println("Graph contains negative weight cycle");
+                    return;
+                }
+            }
+
+            // Print the shortest distances from the source
+            System.out.println("Shortest distances from source node " + source + ":");
+            for (int i = 0; i < vertices; i++) {
+                if (distance[i] != Integer.MAX_VALUE) {
+                    System.out.println("Node " + i + ": " + distance[i]);
+                } else {
+                    System.out.println("Node " + i + ": Infinity");
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Get the number of vertices and edges
+        System.out.println("Enter the number of vertices:");
+        int vertices = scanner.nextInt();
+        System.out.println("Enter the number of edges:");
+        int edges = scanner.nextInt();
+
+        // Create a graph
+        Graph graph = new Graph(vertices, edges);
+
+        // Add edges to the graph
+        System.out.println("Enter the edges in the format (source destination weight):");
+        for (int i = 0; i < edges; i++) {
+            int source = scanner.nextInt();
+            int destination = scanner.nextInt();
+            int weight = scanner.nextInt();
+            graph.addEdge(source, destination, weight);
+        }
+
+        // Get the source node
+        System.out.println("Enter the source node:");
+        int source = scanner.nextInt();
+
+        // Run Bellman-Ford algorithm
+        graph.bellmanFord(source);
+
+        scanner.close();
+    }
+}
+Sample INPUT
+Enter the number of vertices:
+5
+Enter the number of edges:
+8
+Enter the edges in the format (source destination weight):
+0 1 -1
+0 2 4
+1 2 3
+1 3 2
+1 4 2
+3 2 5
+3 1 1
+4 3 -3
+Enter the source node:
+0
+Topological Sort
+import java.util.*;
+
+class TopologicalSort {
+    static class Graph {
+        private final int vertices;
+        private final List<List<Integer>> adjacencyList;
+
+        Graph(int vertices) {
+            this.vertices = vertices;
+            adjacencyList = new ArrayList<>(vertices);
+            for (int i = 0; i < vertices; i++) {
+                adjacencyList.add(new ArrayList<>());
+            }
+        }
+
+        void addEdge(int source, int destination) {
+            adjacencyList.get(source).add(destination);
+        }
+
+        void topologicalSortUtil(int vertex, boolean[] visited, Stack<Integer> stack) {
+            visited[vertex] = true;
+
+            for (Integer adjacentVertex : adjacencyList.get(vertex)) {
+                if (!visited[adjacentVertex]) {
+                    topologicalSortUtil(adjacentVertex, visited, stack);
+                }
+            }
+
+            stack.push(vertex);
+        }
+
+        void topologicalSort() {
+            Stack<Integer> stack = new Stack<>();
+            boolean[] visited = new boolean[vertices];
+
+            for (int i = 0; i < vertices; i++) {
+                if (!visited[i]) {
+                    topologicalSortUtil(i, visited, stack);
+                }
+            }
+
+            System.out.println("Topological order:");
+            while (!stack.isEmpty()) {
+                System.out.print(stack.pop() + " ");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Get the number of vertices and edges
+        System.out.println("Enter the number of vertices:");
+        int vertices = scanner.nextInt();
+        System.out.println("Enter the number of edges:");
+        int edges = scanner.nextInt();
+
+        // Create a graph
+        Graph graph = new Graph(vertices);
+
+        // Add edges to the graph
+        System.out.println("Enter the edges in the format (source destination):");
+        for (int i = 0; i < edges; i++) {
+            int source = scanner.nextInt();
+            int destination = scanner.nextInt();
+            graph.addEdge(source, destination);
+        }
+
+        // Perform topological sorting
+        graph.topologicalSort();
+
+        scanner.close();
+    }
+}
+Sample INPUT
+Enter the number of vertices:
+6
+Enter the number of edges:
+6
+Enter the edges in the format (source destination):
+5 2
+5 0
+4 0
+4 1
+2 3
+3 1
+Binomial Heap
+import java.util.*;
+
+class BinomialHeap {
+    static class Node {
+        int key, degree;
+        Node parent, child, sibling;
+
+        Node(int key) {
+            this.key = key;
+            this.degree = 0;
+            this.parent = null;
+            this.child = null;
+            this.sibling = null;
+        }
+    }
+
+    static class BinomialHeapImpl {
+        Node head;
+
+        BinomialHeapImpl() {
+            head = null;
+        }
+
+        // Merge two binomial heaps
+        private Node mergeHeaps(Node h1, Node h2) {
+            if (h1 == null)
+                return h2;
+            if (h2 == null)
+                return h1;
+
+            Node res = null;
+            Node tail = null;
+            Node p1 = h1;
+            Node p2 = h2;
+
+            while (p1 != null && p2 != null) {
+                if (p1.degree <= p2.degree) {
+                    if (tail == null) {
+                        tail = p1;
+                        res = p1;
+                    } else {
+                        tail.sibling = p1;
+                        tail = p1;
+                    }
+                    p1 = p1.sibling;
+                } else {
+                    if (tail == null) {
+                        tail = p2;
+                        res = p2;
+                    } else {
+                        tail.sibling = p2;
+                        tail = p2;
+                    }
+                    p2 = p2.sibling;
+                }
+            }
+
+            if (p1 != null)
+                tail.sibling = p1;
+            else
+                tail.sibling = p2;
+
+            return res;
+        }
+
+        // Union two binomial heaps
+        private Node union(Node h1, Node h2) {
+            if (h1 == null && h2 == null)
+                return null;
+            else if (h1 == null)
+                return h2;
+            else if (h2 == null)
+                return h1;
+
+            Node res = mergeHeaps(h1, h2);
+            Node prevX = null;
+            Node x = res;
+            Node nextX = x.sibling;
+
+            while (nextX != null) {
+                if (x.degree != nextX.degree || (nextX.sibling != null && nextX.sibling.degree == x.degree)) {
+                    prevX = x;
+                    x = nextX;
+                } else {
+                    if (x.key <= nextX.key) {
+                        x.sibling = nextX.sibling;
+                        link(nextX, x);
+                    } else {
+                        if (prevX == null)
+                            res = nextX;
+                        else
+                            prevX.sibling = nextX;
+                        link(x, nextX);
+                        x = nextX;
+                    }
+                }
+                nextX = x.sibling;
+            }
+
+            return res;
+        }
+
+        // Link two binomial trees
+        private void link(Node x, Node y) {
+            x.parent = y;
+            x.sibling = y.child;
+            y.child = x;
+            y.degree++;
+        }
+
+        // Insert a key into the binomial heap
+        public void insert(int key) {
+            Node newNode = new Node(key);
+            head = union(head, newNode);
+        }
+
+        // Find the minimum key in the binomial heap
+        public int findMinimum() {
+            if (head == null)
+                return Integer.MIN_VALUE;
+
+            Node minNode = head;
+            int minVal = head.key;
+            Node current = head.sibling;
+
+            while (current != null) {
+                if (current.key < minVal) {
+                    minNode = current;
+                    minVal = current.key;
+                }
+                current = current.sibling;
+            }
+
+            return minVal;
+        }
+
+        // Extract the minimum key from the binomial heap
+        public int extractMin() {
+            if (head == null)
+                return Integer.MIN_VALUE;
+
+            Node prevMin = null;
+            Node min = head;
+            Node prev = null;
+            Node current = head.sibling;
+            Node next = head;
+
+            while (next != null) {
+                if (next.key < min.key) {
+                    min = next;
+                    prevMin = prev;
+                }
+                prev = next;
+                next = next.sibling;
+            }
+
+            if (prevMin == null)
+                head = min.sibling;
+            else
+                prevMin.sibling = min.sibling;
+
+            // Reverse the order of the children of the minimum node
+            Node child = min.child;
+            Node prevChild = null;
+            Node nextChild = null;
+
+            while (child != null) {
+                nextChild = child.sibling;
+                child.sibling = prevChild;
+                child.parent = null;
+                prevChild = child;
+                child = nextChild;
+            }
+
+            head = union(head, prevChild);
+
+            return min.key;
+        }
+
+        // Print the binomial heap
+        public void printHeap() {
+            if (head == null)
+                return;
+
+            Queue<Node> queue = new LinkedList<>();
+            queue.offer(head);
+
+            while (!queue.isEmpty()) {
+                Node current = queue.poll();
+                System.out.print(current.key + " ");
+
+                if (current.child != null) {
+                    Node child = current.child;
+                    while (child != null) {
+                        queue.offer(child);
+                        child = child.sibling;
+                    }
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        BinomialHeapImpl binomialHeap = new BinomialHeapImpl();
+
+        while (true) {
+            System.out.println("\n1. Insert key");
+            System.out.println("2. Find minimum key");
+            System.out.println("3. Extract minimum key");
+            System.out.println("4. Print heap");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter key to insert: ");
+                    int key = scanner.nextInt();
+                    binomialHeap.insert(key);
+                    break;
+                case 2:
+                    int min = binomialHeap.findMinimum();
+                    if (min == Integer.MIN_VALUE)
+                        System.out.println("Heap is empty");
+                    else
+                        System.out.println("Minimum key: " + min);
+                    break;
+                case 3:
+                    int extractedMin = binomialHeap.extractMin();
+                    if (extractedMin == Integer.MIN_VALUE)
+                        System.out.println("Heap is empty");
+                    else
+                        System.out.println("Extracted minimum key: " + extractedMin);
+                    break;
+                case 4:
+                    System.out.print("Heap: ");
+                    binomialHeap.printHeap();
+                    System.out.println();
+                    break;
+                case 5:
+                    scanner.close();
+                    System.exit(0);
+                default:
+                    System.out.println("Invalid choice");
+            }
+        }
+    }
+}
+Sample INPUT
+1. Insert key
+2. Find minimum key
+3. Extract minimum key
+4. Print heap
+5. Exit
+Enter your choice: 1
+Enter key to insert: 8
+
+1. Insert key
+2. Find minimum key
+3. Extract minimum key
+4. Print heap
+5. Exit
+Enter your choice: 1
+Enter key to insert: 4
+
+1. Insert key
+2. Find minimum key
+3. Extract minimum key
+4. Print heap
+5. Exit
+Enter your choice: 1
+Enter key to insert: 10
+
+1. Insert key
+2. Find minimum key
+3. Extract minimum key
+4. Print heap
+5. Exit
+Enter your choice: 4
+Heap: 4 8 10
+
+1. Insert key
+2. Find minimum key
+3. Extract minimum key
+4. Print heap
+5. Exit
+Enter your choice: 2
+Minimum key: 4
+
+1. Insert key
+2. Find minimum key
+3. Extract minimum key
+4. Print heap
+5. Exit
+Enter your choice: 3
+Extracted minimum key: 4
+
+1. Insert key
+2. Find minimum key
+3. Extract minimum key
+4. Print heap
+5. Exit
+Enter your choice: 4
+Heap: 8 10
+
+1. Insert key
+2. Find minimum key
+3. Extract minimum key
+4. Print heap
+5. Exit
+Enter your choice: 5
+
+////////////////////// winner tree/////////////
+
+import java.util.*;
+
+class Node {
+    int idx;
+    Node left, right;
+}
+
+public class Main {
+
+    static Node createNode(int idx) {
+        Node t = new Node();
+        t.left = t.right = null;
+        t.idx = idx;
+        return t;
+    }
+
+    static void traverseHeight(Node root, int[] arr, int[] res) {
+        if (root == null || (root.left == null && root.right == null))
+            return;
+        if (res[0] > arr[root.left.idx] && root.left.idx != root.idx) {
+            res[0] = arr[root.left.idx];
+            traverseHeight(root.right, arr, res);
+        } else if (res[0] > arr[root.right.idx] && root.right.idx != root.idx) {
+            res[0] = arr[root.right.idx];
+            traverseHeight(root.left, arr, res);
+        }
+    }
+
+    static void findSecondMin(int[] arr, int n) {
+        List<Node> li = new LinkedList<>();
+        Node root = null;
+        for (int i = 0; i < n; i += 2) {
+            Node t1 = createNode(i);
+            Node t2 = null;
+            if (i + 1 < n) {
+                t2 = createNode(i + 1);
+                root = (arr[i] < arr[i + 1]) ? createNode(i) : createNode(i + 1);
+                root.left = t1;
+                root.right = t2;
+                li.add(root);
+            } else
+                li.add(t1);
+        }
+        int lsize = li.size();
+        while (lsize != 1) {
+            int last = (lsize & 1) == 1 ? lsize - 2 : lsize - 1;
+            for (int i = 0; i < last; i += 2) {
+                Node f1 = li.remove(0);
+                Node f2 = li.remove(0);
+                root = (arr[f1.idx] < arr[f2.idx]) ? createNode(f1.idx) : createNode(f2.idx);
+                root.left = f1;
+                root.right = f2;
+                li.add(root);
+            }
+            if ((lsize & 1) == 1) {
+                li.add(li.get(0));
+                li.remove(0);
+            }
+            lsize = li.size();
+        }
+
+        int[] res = { Integer.MAX_VALUE };
+        traverseHeight(root, arr, res);
+        System.out.println("Minimum: " + arr[root.idx] + ", Second minimum: " + res[0]);
+    }
+
+    public static void main(String[] args) {
+        Scanner s = new Scanner(System.in);
+        System.out.print("Enter the number of elements: ");
+        int n = s.nextInt();
+        int arr[] = new int[n];
+        System.out.println("Enter the elements:");
+        for (int i = 0; i < n; i++)
+            arr[i] = s.nextInt();
+        findSecondMin(arr, n);
+        s.close();
+    }
+}
+
+
