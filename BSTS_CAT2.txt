@@ -1,149 +1,239 @@
-import java.util.*;
-class TreeNode {
-    int val;
-    TreeNode left;
-    TreeNode right;
-    TreeNode() {
-    }
-    TreeNode(int val) {
-        this.val = val;
-    }
-    TreeNode(int val, TreeNode left, TreeNode right) {
-        this.val = val;
-        this.left = left;
-        this.right = right;
-    }
-}
-public class Solution {
-    Map<Integer, TreeMap<Integer, PriorityQueue<Integer>>> nodes;
-    public List<List<Integer>> verticalTraversal(TreeNode root) {
-        if (root == null)
-            return null;
-        nodes = new TreeMap<>();
-        dfs(root, 0, 0);
-        List<List<Integer>> res = new LinkedList<>();
-        for (int key : nodes.keySet()) {
-            List<Integer> list = new LinkedList<>();
-            TreeMap<Integer, PriorityQueue<Integer>> temp = nodes.get(key);
-            for (int k : temp.keySet()) {
-                PriorityQueue<Integer> que = temp.get(k);
-                while (!que.isEmpty()) {
-                    list.add(que.poll());
-                }
-            }
-            res.add(list);
-        }
-        return res;
-    }
-    private void dfs(TreeNode root, int index, int level) {
-        if (root == null)
-            return;
-        nodes.putIfAbsent(index, new TreeMap<>());
-        nodes.get(index).putIfAbsent(level, new PriorityQueue<>());
-        nodes.get(index).get(level).add(root.val);
-        dfs(root.left, index - 1, level + 1);
-        dfs(root.right, index + 1, level + 1);
-    }
-    public static void main(String[] args) {
-        // Example usage:
-        // Constructing a binary tree
-        TreeNode root = new TreeNode(3);
-        root.left = new TreeNode(9);
-        root.right = new TreeNode(20);
-        root.right.left = new TreeNode(15);
-        root.right.right = new TreeNode(7);
-
-        // Vertical traversal
-        Solution solution = new Solution();
-        List<List<Integer>> result = solution.verticalTraversal(root);
-
-        // Printing the result
-        for (List<Integer> list : result) {
-            System.out.println(list);
-        }
-    }
-}
-
-
 
 VERTICAL TRAVERSAL
-
-BOUNDARY TRAVERSAL
 import java.util.*;
-class Node {
-    int data;
-    Node left, right;
-    Node(int data) {
-        this.data = data;
-        this.left = this.right = null;
+
+// TreeNode class representing each node in the binary tree
+class TreeNode {
+    int val;
+    TreeNode left, right;
+
+    TreeNode(int val) {
+        this.val = val;
+        left = right = null;
     }
 }
-class BinaryTree {
-    static void printLeftBoundary(Node root) {
-        if (root == null) {
-            return;
-        }
-        if (root.left != null || root.right != null) {
-            System.out.print(root.data + " ");
-        }
-        if (root.left != null) {
-            printLeftBoundary(root.left);
-        } 
-        else {
-            printLeftBoundary(root.right);
+
+// Class representing vertical order traversal
+class VerticalOrderTraversal {
+    // Helper class to store node and its horizontal distance from root
+    static class Pair {
+        TreeNode node;
+        int hd; // Horizontal distance
+
+        Pair(TreeNode node, int hd) {
+            this.node = node;
+            this.hd = hd;
         }
     }
-    static void printRightBoundary(Node root) {
-        if (root == null) {
+
+    // Function to perform vertical order traversal
+    public static void verticalOrderTraversal(TreeNode root) {
+        if (root == null)
             return;
+
+        // TreeMap to store nodes at each horizontal distance
+        TreeMap<Integer, List<Integer>> map = new TreeMap<>();
+        Queue<Pair> queue = new LinkedList<>();
+        queue.offer(new Pair(root, 0)); // Root has horizontal distance 0
+
+        // Perform level order traversal
+        while (!queue.isEmpty()) {
+            Pair pair = queue.poll();
+            TreeNode node = pair.node;
+            int hd = pair.hd;
+
+            // Add node value to corresponding horizontal distance list in the map
+            if (!map.containsKey(hd)) {
+                map.put(hd, new ArrayList<>());
+            }
+            map.get(hd).add(node.val);
+
+            // Enqueue left and right children with corresponding horizontal distances
+            if (node.left != null)
+                queue.offer(new Pair(node.left, hd - 1));
+            if (node.right != null)
+                queue.offer(new Pair(node.right, hd + 1));
         }
-        if (root.right != null) {
-            printRightBoundary(root.right);
-        } 
-        else {
-            printRightBoundary(root.left);
-        }
-        if (root.left != null || root.right != null) {
-            System.out.print(root.data + " ");
+
+        // Print nodes for each horizontal distance
+        for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
+            System.out.print("Vertical distance " + entry.getKey() + ": ");
+            for (int val : entry.getValue()) {
+                System.out.print(val + " ");
+            }
+            System.out.println();
         }
     }
-    static void printLeaves(Node root) {
-        if (root == null) {
-            return;
+
+    // Function to build binary tree from user input
+    public static TreeNode buildTree() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the root value: ");
+        int rootValue = scanner.nextInt();
+        TreeNode root = new TreeNode(rootValue);
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+            TreeNode current = queue.poll();
+            System.out.print("Enter left child value for " + current.val + " (or -1 if none): ");
+            int leftValue = scanner.nextInt();
+            if (leftValue != -1) {
+                current.left = new TreeNode(leftValue);
+                queue.offer(current.left);
+            }
+            System.out.print("Enter right child value for " + current.val + " (or -1 if none): ");
+            int rightValue = scanner.nextInt();
+            if (rightValue != -1) {
+                current.right = new TreeNode(rightValue);
+                queue.offer(current.right);
+            }
         }
-        printLeaves(root.left);
-        if (root.left == null && root.right == null) {
-            System.out.print(root.data + " ");
-        }
-        printLeaves(root.right);
+
+        scanner.close();
+        return root;
     }
-    static void printBoundary(Node root) {
-        if (root == null) {
+
+    public static void main(String[] args) {
+        TreeNode root = buildTree();
+        System.out.println("\nVertical Order Traversal:");
+        verticalOrderTraversal(root);
+    }
+}
+
+Sample Input:
+Enter the root value: 1
+Enter left child value for 1 (or -1 if none): 2
+Enter right child value for 1 (or -1 if none): 3
+Enter left child value for 2 (or -1 if none): 4
+Enter right child value for 2 (or -1 if none): 5
+Enter left child value for 3 (or -1 if none): -1
+Enter right child value for 3 (or -1 if none): 6
+Enter left child value for 4 (or -1 if none): -1
+Enter right child value for 4 (or -1 if none): -1
+Enter left child value for 5 (or -1 if none): -1
+Enter right child value for 5 (or -1 if none): -1
+Enter left child value for 6 (or -1 if none): -1
+Enter right child value for 6 (or -1 if none): -1
+BOUNDARY TRAVERSAL
+import java.util.*;
+
+// TreeNode class representing each node in the binary tree
+class TreeNode {
+    int val;
+    TreeNode left, right;
+
+    TreeNode(int val) {
+        this.val = val;
+        left = right = null;
+    }
+}
+
+// Class representing boundary traversal
+class BoundaryTraversal {
+    // Function to perform boundary traversal
+    public static void boundaryTraversal(TreeNode root) {
+        if (root == null)
             return;
-        }
-        System.out.print(root.data + " ");
+
+        System.out.print(root.val + " ");
+
         printLeftBoundary(root.left);
         printLeaves(root.left);
         printLeaves(root.right);
         printRightBoundary(root.right);
     }
+
+    // Function to print the left boundary of the tree (excluding leaves)
+    private static void printLeftBoundary(TreeNode root) {
+        if (root == null || (root.left == null && root.right == null))
+            return;
+
+        System.out.print(root.val + " ");
+
+        if (root.left != null)
+            printLeftBoundary(root.left);
+        else
+            printLeftBoundary(root.right);
+    }
+
+    // Function to print the leaves of the tree
+    private static void printLeaves(TreeNode root) {
+        if (root == null)
+            return;
+
+        printLeaves(root.left);
+
+        if (root.left == null && root.right == null)
+            System.out.print(root.val + " ");
+
+        printLeaves(root.right);
+    }
+
+    // Function to print the right boundary of the tree (excluding leaves)
+    private static void printRightBoundary(TreeNode root) {
+        if (root == null || (root.left == null && root.right == null))
+            return;
+
+        if (root.right != null)
+            printRightBoundary(root.right);
+        else
+            printRightBoundary(root.left);
+
+        System.out.print(root.val + " ");
+    }
+
+    // Function to build binary tree from user input
+    public static TreeNode buildTree() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the root value: ");
+        int rootValue = scanner.nextInt();
+        TreeNode root = new TreeNode(rootValue);
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+            TreeNode current = queue.poll();
+            System.out.print("Enter left child value for " + current.val + " (or -1 if none): ");
+            int leftValue = scanner.nextInt();
+            if (leftValue != -1) {
+                current.left = new TreeNode(leftValue);
+                queue.offer(current.left);
+            }
+            System.out.print("Enter right child value for " + current.val + " (or -1 if none): ");
+            int rightValue = scanner.nextInt();
+            if (rightValue != -1) {
+                current.right = new TreeNode(rightValue);
+                queue.offer(current.right);
+            }
+        }
+
+        scanner.close();
+        return root;
+    }
+
     public static void main(String[] args) {
-        Node root = new Node(20);
-        root.left = new Node(8);
-        root.left.left = new Node(4);
-        root.left.right = new Node(12);
-        root.left.right.left = new Node(10);
-        root.left.right.right = new Node(14);
-        root.right = new Node(22);
-        root.right.right = new Node(25);
-        printBoundary(root);
+        TreeNode root = buildTree();
+        System.out.println("\nBoundary Traversal:");
+        boundaryTraversal(root);
     }
 }
-
-
-
-
-
+Sample input:
+Enter the root value: 1
+Enter left child value for 1 (or -1 if none): 2
+Enter right child value for 1 (or -1 if none): 3
+Enter left child value for 2 (or -1 if none): 4
+Enter right child value for 2 (or -1 if none): 5
+Enter left child value for 3 (or -1 if none): -1
+Enter right child value for 3 (or -1 if none): 6
+Enter left child value for 4 (or -1 if none): -1
+Enter right child value for 4 (or -1 if none): -1
+Enter left child value for 5 (or -1 if none): -1
+Enter right child value for 5 (or -1 if none): -1
+Enter left child value for 6 (or -1 if none): -1
+Enter right child value for 6 (or -1 if none): -1
 
 
 
@@ -153,216 +243,393 @@ class BinaryTree {
 HEAP SORT
 
 import java.util.*;
-class HeapSortUsingSTL {
-    public static void heapSort(int[] arr)
-    {
-        PriorityQueue<Integer> maxHeap
-            = new PriorityQueue<>(
-                Collections.reverseOrder());
-        for (int i = 0; i < arr.length; i++) {
-            maxHeap.offer(arr[i]);
+
+class HeapSort {
+    // Function to perform heap sort
+    public static void heapSort(int[] arr) {
+        int n = arr.length;
+
+        // Build max heap
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            heapify(arr, n, i);
         }
-        for (int i = arr.length - 1; i >= 0; i--) {
-            arr[i] = maxHeap.poll();
+
+        // Extract elements from heap one by one
+        for (int i = n - 1; i > 0; i--) {
+            // Swap root with current last node
+            int temp = arr[0];
+            arr[0] = arr[i];
+            arr[i] = temp;
+
+            // Call max heapify on the reduced heap
+            heapify(arr, i, 0);
         }
     }
-    public static void main(String[] args)
-    {
-        int[] arr = { 60, 20, 40, 70, 30, 10 };
+
+    // Function to heapify a subtree rooted at index i
+    public static void heapify(int[] arr, int n, int i) {
+        int largest = i; // Initialize largest as root
+        int left = 2 * i + 1; // Left child
+        int right = 2 * i + 2; // Right child
+
+        // If left child is larger than root
+        if (left < n && arr[left] > arr[largest])
+            largest = left;
+
+        // If right child is larger than largest so far
+        if (right < n && arr[right] > arr[largest])
+            largest = right;
+
+        // If largest is not root
+        if (largest != i) {
+            int temp = arr[i];
+            arr[i] = arr[largest];
+            arr[largest] = temp;
+
+            // Recursively heapify the affected sub-tree
+            heapify(arr, n, largest);
+        }
+    }
+
+    // Function to print array
+    public static void printArray(int[] arr) {
+        for (int num : arr) {
+            System.out.print(num + " ");
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the number of elements: ");
+        int n = scanner.nextInt();
+        int[] arr = new int[n];
+        System.out.println("Enter the elements:");
+
+        for (int i = 0; i < n; i++) {
+            arr[i] = scanner.nextInt();
+        }
+
+        System.out.println("Original array:");
+        printArray(arr);
+
         heapSort(arr);
-        System.out.println(""+ Arrays.toString(arr));
+
+        System.out.println("Sorted array:");
+        printArray(arr);
+
+        scanner.close();
     }
 }
-
+Sample Input:
+Enter the number of elements: 7
+Enter the elements:
+12
+11
+13
+5
+6
+7
+1
 
 K-ARY HEAP
+import java.util.*;
+
 class KaryHeap {
-    public static void main(String[] args) {
-        final int capacity = 100;
-        int[] arr = new int[capacity];
-        arr[0] = 4;
-        arr[1] = 5;
-        arr[2] = 6;
-        arr[3] = 7;
-        arr[4] = 8;
-        arr[5] = 9;
-        arr[6] = 10;
-        int n = 7;
-        int k = 3;
-        buildHeap(arr, n, k);
-        System.out.println("Built Heap: ");
-        for (int i = 0; i < n; i++)
-            System.out.print(arr[i] + " ");
-        int element = 3;
-        insert(arr, n, k, element);
-        n++;
-        System.out.println("\n\nHeap after insertion of " + element + ": ");
-        for (int i = 0; i < n; i++)
-            System.out.print(arr[i] + " ");
-        System.out.println("\n\nExtracted max is " + extractMax(arr, n, k));
-        n--;
-        System.out.println("\n\nHeap after extract max: ");
-        for (int i = 0; i < n; i++)
-            System.out.print(arr[i] + " ");
+    private int[] heap;
+    private int size;
+    private int k;
+
+    public KaryHeap(int capacity, int k) {
+        heap = new int[capacity];
+        size = 0;
+        this.k = k;
     }
-    public static void buildHeap(int[] arr, int n, int k) {
-        for (int i = (n - 1) / k; i >= 0; i--)
-            restoreDown(arr, n, i, k);
-    }
-    public static void insert(int[] arr, int n, int k, int elem) {
-        arr[n - 1] = elem;
-        restoreUp(arr, n - 1, k);
-    }
-    public static int extractMax(int[] arr, int n, int k) {
-        int max = arr[0];
-        arr[0] = arr[n - 1];
-        restoreDown(arr, n - 1, 0, k);
-        return max;
-    }
-    public static void restoreDown(int[] arr, int len, int index, int k) {
-        int[] child = new int[k + 1];
-        while (true) {
-            for (int i = 1; i <= k; i++)
-                child[i] = (k * index + i) < len ? (k * index + i) : -1;
-            int maxChild = -1, maxChildIndex = 0;
-            for (int i = 1; i <= k; i++) {
-                if (child[i] != -1 && arr[child[i]] > maxChild) {
-                    maxChildIndex = child[i];
-                    maxChild = arr[child[i]];
-                }
-            }
-            if (maxChild == -1)
-                break;
-            if (arr[index] < arr[maxChildIndex])
-                swap(arr, index, maxChildIndex);
-            index = maxChildIndex;
+
+    public void insert(int value) {
+        if (size == heap.length) {
+            System.out.println("Heap is full. Cannot insert more elements.");
+            return;
         }
+
+        heap[size++] = value;
+        heapifyUp(size - 1);
     }
-    public static void restoreUp(int[] arr, int index, int k) {
+
+    private void heapifyUp(int index) {
         int parent = (index - 1) / k;
-        while (parent >= 0) {
-            if (arr[index] > arr[parent]) {
-                swap(arr, index, parent);
-                index = parent;
-                parent = (index - 1) / k;
-            } else
-                break;
+
+        while (index > 0 && heap[index] > heap[parent]) {
+            swap(index, parent);
+            index = parent;
+            parent = (index - 1) / k;
         }
     }
-    public static void swap(int[] arr, int i, int j) {
-        int temp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = temp;
+
+    public int extractMax() {
+        if (size == 0) {
+            throw new IllegalStateException("Heap is empty. Cannot extract max.");
+        }
+
+        int root = heap[0];
+        heap[0] = heap[size - 1];
+        size--;
+        heapifyDown(0);
+        return root;
+    }
+
+    private void heapifyDown(int index) {
+        int maxChildIndex = maxChildIndex(index);
+        while (maxChildIndex != -1 && heap[index] < heap[maxChildIndex]) {
+            swap(index, maxChildIndex);
+            index = maxChildIndex;
+            maxChildIndex = maxChildIndex(index);
+        }
+    }
+
+    private int maxChildIndex(int index) {
+        int startChild = k * index + 1;
+        int endChild = Math.min(startChild + k, size);
+        if (startChild >= size) {
+            return -1;
+        }
+
+        int maxChildIndex = startChild;
+        for (int i = startChild + 1; i < endChild; i++) {
+            if (heap[i] > heap[maxChildIndex]) {
+                maxChildIndex = i;
+            }
+        }
+        return maxChildIndex;
+    }
+
+    private void swap(int i, int j) {
+        int temp = heap[i];
+        heap[i] = heap[j];
+        heap[j] = temp;
+    }
+
+    public void printHeap() {
+        for (int i = 0; i < size; i++) {
+            System.out.print(heap[i] + " ");
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the capacity of the heap: ");
+        int capacity = scanner.nextInt();
+        System.out.print("Enter the value of k for K-ary heap: ");
+        int k = scanner.nextInt();
+
+        KaryHeap karyHeap = new KaryHeap(capacity, k);
+
+        System.out.println("Enter elements to insert into the K-ary heap (enter -1 to stop):");
+        int value = scanner.nextInt();
+        while (value != -1) {
+            karyHeap.insert(value);
+            value = scanner.nextInt();
+        }
+
+        System.out.println("Heap after insertion:");
+        karyHeap.printHeap();
+
+        System.out.println("Extracting maximum element from heap:");
+        int max = karyHeap.extractMax();
+        System.out.println("Maximum element extracted: " + max);
+
+        System.out.println("Heap after extraction:");
+        karyHeap.printHeap();
+
+        scanner.close();
     }
 }
-
-
-
-
+Sample Input:
+Enter the capacity of the heap: 8
+Enter the value of k for K-ary heap: 3
+Enter elements to insert into the K-ary heap (enter -1 to stop):
+12
+7
+15
+10
+9
+3
+17
+4
+-1
 
 BFS
-import java.util.LinkedList;
-import java.util.Queue;
-class Graph {
-    int vertices;
-    LinkedList<Integer>[] adjList;
-    @SuppressWarnings("unchecked") Graph(int vertices)
-    {
-        this.vertices = vertices;
-        adjList = new LinkedList[vertices];
-        for (int i = 0; i < vertices; ++i)
-            adjList[i] = new LinkedList<>();
+import java.util.*;
+
+class BFS {
+    private int V; // Number of vertices
+    private LinkedList<Integer> adj[]; // Adjacency list representation
+
+    // Constructor
+    BFS(int v) {
+        V = v;
+        adj = new LinkedList[v];
+        for (int i = 0; i < v; ++i)
+            adj[i] = new LinkedList();
     }
-    void addEdge(int u, int v) { adjList[u].add(v); }
-    void bfs(int startNode)
-    {
-        Queue<Integer> queue = new LinkedList<>();
-        boolean[] visited = new boolean[vertices];
-        visited[startNode] = true;
-        queue.add(startNode);
-        while (!queue.isEmpty()) {
-            int currentNode = queue.poll();
-            System.out.print(currentNode + " ");
-            for (int neighbor : adjList[currentNode]) {
-                if (!visited[neighbor]) {
-                    visited[neighbor] = true;
-                    queue.add(neighbor);
+
+    // Function to add an edge into the graph
+    void addEdge(int v, int w) {
+        adj[v].add(w);
+    }
+
+    // Function to perform BFS traversal from a given source vertex
+    void bfs(int s) {
+        // Mark all the vertices as not visited
+        boolean visited[] = new boolean[V];
+
+        // Create a queue for BFS
+        LinkedList<Integer> queue = new LinkedList<Integer>();
+
+        // Mark the current node as visited and enqueue it
+        visited[s] = true;
+        queue.add(s);
+
+        while (queue.size() != 0) {
+            // Dequeue a vertex from queue and print it
+            s = queue.poll();
+            System.out.print(s + " ");
+
+            // Get all adjacent vertices of the dequeued vertex s. If an adjacent has not been visited, then mark it visited and enqueue it
+            Iterator<Integer> i = adj[s].listIterator();
+            while (i.hasNext()) {
+                int n = i.next();
+                if (!visited[n]) {
+                    visited[n] = true;
+                    queue.add(n);
                 }
             }
         }
     }
-}
-public class Main {
-    public static void main(String[] args)
-    {
-        int vertices = 5;
-        Graph graph = new Graph(vertices);
-        graph.addEdge(0, 1);
-        graph.addEdge(0, 2);
-        graph.addEdge(1, 3);
-        graph.addEdge(1, 4);
-        graph.addEdge(2, 4);
-        System.out.println();
-        graph.bfs(0);
+
+    public static void main(String args[]) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of vertices: ");
+        int V = scanner.nextInt();
+        BFS graph = new BFS(V);
+
+        System.out.print("Enter the number of edges: ");
+        int E = scanner.nextInt();
+
+        System.out.println("Enter the edges (source destination):");
+        for (int i = 0; i < E; ++i) {
+            int source = scanner.nextInt();
+            int destination = scanner.nextInt();
+            graph.addEdge(source, destination);
+        }
+
+        System.out.print("Enter the source vertex for BFS: ");
+        int sourceVertex = scanner.nextInt();
+
+        System.out.println("BFS traversal starting from vertex " + sourceVertex + ":");
+        graph.bfs(sourceVertex);
+
+        scanner.close();
     }
 }
-
+Sample Input:
+Enter the number of vertices: 6
+Enter the number of edges: 8
+Enter the edges (source destination):
+0 1
+0 2
+1 3
+1 4
+2 4
+3 4
+3 5
+4 5
+Enter the source vertex for BFS: 0
 DFS
 import java.util.*;
-class Graph {
-    private int V;                          
-    private LinkedList<Integer> adj[];          
-    public Graph(int v)
-    {
+
+class DFS {
+    private int V; // Number of vertices
+    private LinkedList<Integer> adj[]; // Adjacency list representation
+
+    // Constructor
+    DFS(int v) {
         V = v;
         adj = new LinkedList[v];
-        for (int i = 0; i < v; ++i) {
+        for (int i = 0; i < v; ++i)
             adj[i] = new LinkedList();
+    }
+
+    // Function to add an edge into the graph
+    void addEdge(int v, int w) {
+        adj[v].add(w);
+    }
+
+    // Function to perform DFS traversal from a given source vertex
+    void dfsUtil(int v, boolean visited[]) {
+        // Mark the current node as visited and print it
+        visited[v] = true;
+        System.out.print(v + " ");
+
+        // Recur for all the vertices adjacent to this vertex
+        Iterator<Integer> i = adj[v].listIterator();
+        while (i.hasNext()) {
+            int n = i.next();
+            if (!visited[n])
+                dfsUtil(n, visited);
         }
     }
-    void addEdge(int v, int w)
-    {
-        adj[v].add(w);                              
+
+    // Function to perform DFS traversal starting from a given source vertex
+    void dfs(int v) {
+        // Mark all the vertices as not visited(set as false by default in java)
+        boolean visited[] = new boolean[V];
+
+        // Call the recursive helper function to print DFS traversal
+        dfsUtil(v, visited);
     }
-    void DFSUtil(int vertex, boolean nodes[])
-    {
-        nodes[vertex] = true;                         
-        System.out.print(vertex + " ");
-        int a = 0;
- 
-        for (int i = 0; i < adj[vertex].size(); i++)  
-        {
-            a = adj[vertex].get(i);
-            if (!nodes[a])                   
-            {
-                DFSUtil(a, nodes);
-            }
-        }  
-    }
-    void DFS(int v)
-    {
-        boolean already[] = new boolean[V]; 
-        DFSUtil(v, already);
-    }
-    public static void main(String args[])
-    {
-        Graph g = new Graph(6);
-        g.addEdge(0, 1);
-        g.addEdge(0, 2);
-        g.addEdge(1, 0);
-        g.addEdge(1, 3);
-        g.addEdge(2, 0);
-        g.addEdge(2, 3);
-        g.addEdge(3, 4);
-        g.addEdge(3, 5);
-        g.addEdge(4, 3);
-        g.addEdge(5, 3);
-        System.out.println("");
-        g.DFS(0);
+
+    public static void main(String args[]) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of vertices: ");
+        int V = scanner.nextInt();
+        DFS graph = new DFS(V);
+
+        System.out.print("Enter the number of edges: ");
+        int E = scanner.nextInt();
+
+        System.out.println("Enter the edges (source destination):");
+        for (int i = 0; i < E; ++i) {
+            int source = scanner.nextInt();
+            int destination = scanner.nextInt();
+            graph.addEdge(source, destination);
+        }
+
+        System.out.print("Enter the source vertex for DFS: ");
+        int sourceVertex = scanner.nextInt();
+
+        System.out.println("DFS traversal starting from vertex " + sourceVertex + ":");
+        graph.dfs(sourceVertex);
+
+        scanner.close();
     }
 }
+Sample Input:
 
-
+Enter the number of vertices: 6
+Enter the number of edges: 7
+Enter the edges (source destination):
+0 1
+0 2
+1 3
+1 4
+2 4
+3 5
+4 5
+Enter the source vertex for DFS: 0
 Recover BST
 import java.util.Scanner;
 
@@ -1222,9 +1489,7 @@ Heap: 8 10
 4. Print heap
 5. Exit
 Enter your choice: 5
-
-////////////////////// winner tree/////////////
-
+Wiiner Tree
 import java.util.*;
 
 class Node {
@@ -1303,5 +1568,3 @@ public class Main {
         s.close();
     }
 }
-
-
